@@ -56,6 +56,7 @@ export default {
     advanced: 'Advanced',
     config: 'Config',
     avatarLink: 'Avatar Link',
+    secretKey: 'Secret Key',
     name: 'Name',
     description: 'Description',
     role: 'Role',

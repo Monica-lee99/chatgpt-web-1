@@ -56,6 +56,7 @@ export default {
     advanced: 'Дополнительно',
     config: 'Конфигурация',
     avatarLink: 'Ссылка на аватар',
+    secretKey: 'ключ',
     name: 'Имя',
     description: 'Описание',
     role: 'Роль',

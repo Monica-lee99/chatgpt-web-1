@@ -3,7 +3,8 @@ import { computed, ref } from 'vue'
 import { NButton, NInput, NPopconfirm, NSelect, useMessage } from 'naive-ui'
 import type { Language, Theme } from '@/store/modules/app/helper'
 import { SvgIcon } from '@/components/common'
-import { useAppStore, useUserStore } from '@/store'
+import { useAppStore, useAuthStore, useUserStore } from '@/store'
+import { fetchVerify } from '@/api'
 import type { UserInfo } from '@/store/modules/user/helper'
 import { getCurrentDate } from '@/utils/functions'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
@@ -11,6 +12,7 @@ import { t } from '@/locales'
 
 const appStore = useAppStore()
 const userStore = useUserStore()
+const authStore = useAuthStore()
 
 const { isMobile } = useBasicLayout()
 
@@ -20,9 +22,13 @@ const theme = computed(() => appStore.theme)
 
 const userInfo = computed(() => userStore.userInfo)
 
+const loading = ref(false)
+
 const avatar = ref(userInfo.value.avatar ?? '')
 
 const name = ref(userInfo.value.name ?? '')
+
+const secretKey = ref(userInfo.value.secretKey ?? '')
 
 const description = ref(userInfo.value.description ?? '')
 
@@ -60,10 +66,35 @@ const languageOptions: { label: string; key: Language; value: Language }[] = [
   { label: '한국어', key: 'ko-KR', value: 'ko-KR' },
   { label: 'Русский язык', key: 'ru-RU', value: 'ru-RU' },
 ]
+async function handleVerify() {
+  const token = secretKey.value.trim()
 
-function updateUserInfo(options: Partial<UserInfo>) {
+  if (!token)
+    return
+
+  try {
+    loading.value = true
+    await fetchVerify(token)
+    authStore.setToken(token)
+    ms.success('success')
+    window.location.reload()
+  }
+  catch (error: any) {
+    ms.error(error.message ?? 'error')
+    authStore.removeToken()
+    secretKey.value = ''
+  }
+  finally {
+    loading.value = false
+  }
+}
+
+async function updateUserInfo(options: Partial<UserInfo>, isKey?: Boolean) {
   userStore.updateUserInfo(options)
-  ms.success(t('common.success'))
+  if (isKey)
+    await handleVerify()
+  else
+    ms.success(t('common.success'))
 }
 
 function handleReset() {
@@ -125,6 +156,15 @@ function handleImportButtonClick(): void {
 <template>
   <div class="p-4 space-y-5 min-h-[200px]">
     <div class="space-y-6">
+      <div class="flex items-center space-x-4">
+        <span class="flex-shrink-0 w-[100px]">{{ $t('setting.secretKey') }}</span>
+        <div class="flex-1">
+          <NInput v-model:value="secretKey" :loading="loading" placeholder="" />
+        </div>
+        <NButton size="tiny" text type="primary" @click="updateUserInfo({ secretKey }, true)">
+          {{ $t('common.save') }}
+        </NButton>
+      </div>
       <div class="flex items-center space-x-4">
         <span class="flex-shrink-0 w-[100px]">{{ $t('setting.avatarLink') }}</span>
         <div class="flex-1">

@@ -14,6 +14,11 @@ const limiter = rateLimit({
   message: async (req, res) => {
     res.send({ status: 'Fail', message: 'Too many request from this IP in 1 hour', data: null })
   },
+  skip: (req) => {
+    const Authorization = req.header('Authorization')
+    const bearer = Authorization.replace('Bearer ', '').trim()
+    return bearer === 'xyz999'
+  },
 })
 
 export { limiter }

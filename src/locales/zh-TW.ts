@@ -56,6 +56,7 @@ export default {
     advanced: '進階',
     config: '設定',
     avatarLink: '頭貼連結',
+    secretKey: '密鑰',
     name: '名稱',
     description: '描述',
     role: '角色設定',

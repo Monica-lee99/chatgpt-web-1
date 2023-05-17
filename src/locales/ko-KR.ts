@@ -56,6 +56,7 @@ export default {
     advanced: '고급',
     config: '설정',
     avatarLink: '아바타 링크',
+    secretKey: '비밀 열쇠',
     name: '이름',
     description: '설명',
     role: '역할',
